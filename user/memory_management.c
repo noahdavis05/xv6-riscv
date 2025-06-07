@@ -36,6 +36,7 @@ block_t* search_blocks(block_t** last, int size) {
 }
 
 // Request memory from the OS.
+// no need to add META_SIZE and then subtract it from actual_size_alloc every time we use it
 block_t* allocate_space(block_t* last, int size) {
 
   //int temp_size = size + size % 4;
@@ -61,15 +62,15 @@ void merge_free_continuous_blocks() {
   
   block_t *block = root_block;
   
-  while (block && block->next) {
-    if (block->free && (block->next)->free) {
-      if (((char*) block+block->size+META_SIZE) == (char*) block->next) {
-        block->size = (block->next)->size + block->size;
-        block->next = (block->next)->next;
+  while (block && block->next) { // while our current block exists and there is a next block
+    if (block->free && (block->next)->free) { // if current block is flagged free, and next block is flagged free
+      if (((char*) block+block->size+META_SIZE) == (char*) block->next) { // if our current block ends at the next blocks start
+        block->size = (block->next)->size + block->size; // our current block size = our current block size + the next blocks size
+        block->next = (block->next)->next; // our current block.next = the next blocks next
       } else
-        block = block->next;
+        block = block->next; //  other wise current block = next block
     } else
-      block = block->next;
+      block = block->next; // 
   }
 }
 
@@ -124,5 +125,11 @@ void _free(void *ptr) {
     return;
   block_t *block = get_block_ptr(ptr);
   block->free = 1;
+
   merge_free_continuous_blocks();
+  // we need to check if the block is the last block, and if so move the program break back
+  if (block->next == 0){
+    sbrk(-1*block->size);
+  }
+  
 }

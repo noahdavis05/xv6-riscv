@@ -158,6 +158,7 @@ void test_alloc_null_ptr(){
   exit(0);
 }
 
+// tests that the after pointer is moved back once a block of memory is freed
 void test_alloc_give_back(){
   printf("test_alloc_give_back");
   close(1);
