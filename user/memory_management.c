@@ -38,7 +38,9 @@ block_t* search_blocks(block_t** last, int size) {
 // Request memory from the OS.
 block_t* allocate_space(block_t* last, int size) {
 
+  //int temp_size = size + size % 4;
   int actual_size_alloc = (size + META_SIZE);
+  
   
   block_t *current = (block_t*) sbrk(0);
   block_t *requested = (block_t*) sbrk(actual_size_alloc - META_SIZE);
@@ -89,6 +91,9 @@ void* _malloc(int size) {
   
   if (size <= 0)
     return 0;
+
+  size += size % 4;
+  //size = (size + 3) & ~0x3;
   
   block_t* block;
   

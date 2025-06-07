@@ -124,6 +124,7 @@ void test_malloc_too_much(){
   exit(0);
 }
 
+// tests whether allocated memory is aligned to a 4 byte boundary
 void test_malloc_align(){
   printf("test_malloc_align");
   close(1);
