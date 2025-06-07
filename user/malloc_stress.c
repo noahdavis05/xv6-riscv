@@ -181,9 +181,15 @@ void test_next_merge_space_0(){
   void * ptr_0 = USER_MALLOC(1000);
 	void * ptr_1 = USER_MALLOC(1000);
 	void * ptr_2 = USER_MALLOC(1000);
+  printf("1");
+  print_mem_blocks();
 	USER_FREE(ptr_1);
 	USER_FREE(ptr_0);
+  printf("2");
+  print_mem_blocks();
 	void * ptr_3 = USER_MALLOC(1500);
+  printf("3");
+  print_mem_blocks();
 
   if(ptr_3 > ptr_2){
     exit(-1);
@@ -196,7 +202,6 @@ void test_next_merge_space_0(){
   if(ptr_3 < ptr_0){
     exit(-1);
   }
-
   exit(0);
 }
 
@@ -328,6 +333,14 @@ void test_sbrk_opt(){
   }
 }
 
+void my_own_test(){
+  void * ptr_0 = USER_MALLOC(1000);
+  void * ptr_1 = USER_MALLOC(1000);
+  printf("Address of p0: %p\n", (void *)ptr_0);
+  printf("Address of p1: %p\n", (void *)ptr_1);
+  print_mem_blocks();
+}
+
 
 void (*test_func[17])() =
     {
@@ -378,5 +391,7 @@ main(int argc, char *argv[])
 
 
   }
+  //my_own_test();
+    test_next_merge_space_0();
     exit(0);
 }

@@ -8,7 +8,7 @@ void print_mem_blocks() {
 
   block_t *block = root_block;
   while (block) {
-    //printf("Start address: %x \n", block);
+    printf("Start address: %p \n", block);
     printf("Size: %d \n", block->size);
     printf("Free: %d \n\n", block->free);
     block = block -> next;
@@ -25,7 +25,7 @@ block_t* search_blocks(block_t** last, int size) {
   
   block_t *current = root_block;
   while (current) {
-    if (current->free && (current->size == size))
+    if (current->free && (current->size >= size))
       break;
     else {
       *last = current;
@@ -44,7 +44,7 @@ block_t* allocate_space(block_t* last, int size) {
   
   
   block_t *current = (block_t*) sbrk(0);
-  block_t *requested = (block_t*) sbrk(actual_size_alloc - META_SIZE);
+  block_t *requested = (block_t*) sbrk(actual_size_alloc ); // got rid of the - META_SIZE as our allocated memory overlaps with the next META_SIZE for the next block
   if (current != requested)
     fprintf(2, "Memory allocation with sbrk failed");
 
@@ -102,17 +102,25 @@ void* _malloc(int size) {
   // the head of the list of blocks.
   if (!root_block) {
     block = allocate_space(0, size);
-    if (!block)
+    if (!block){
+      printf("Crashing out");
       return 0;
+    }
+
+      
     root_block = block;
   } else {
     block_t* last = root_block;
     block = search_blocks(&last, size);
     if (!block) {
+      //printf("\n Could not allocate space within memory - expanding \n");
       block = allocate_space(last, size);
-      if (!block)
+      if (!block) {
+        //printf("\n Problem expanding memory \n");
         return 0;
+      }
     } else {
+      //printf("\n Found a slot in memory - placing in now \n");
       block->free = 0;
     }
   }
@@ -131,5 +139,4 @@ void _free(void *ptr) {
   if (block->next == 0){
     sbrk(-1*block->size);
   }
-  
 }
